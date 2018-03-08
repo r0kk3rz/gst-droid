@@ -36,6 +36,7 @@ GST_DEBUG_CATEGORY (gst_droid_codec_debug);
 
 static GstBuffer *create_mpeg4venc_codec_data (DroidMediaData * data);
 static GstBuffer *create_h264enc_codec_data (DroidMediaData * data);
+static GstBuffer *create_vp8venc_codec_data (DroidMediaData * data);
 static gboolean create_mpeg4vdec_codec_data_from_codec_data (GstDroidCodec *
     codec, GstBuffer * data, DroidMediaData * out);
 static gboolean create_h264dec_codec_data_from_codec_data (GstDroidCodec *
@@ -147,6 +148,10 @@ static GstDroidCodecInfo codecs[] = {
         "video/x-h264, stream-format=avc,alignment=au", TRUE,
         is_h264_enc, h264enc_complement, create_h264enc_codec_data,
       process_h264enc_data, NULL, NULL, NULL},
+
+  {GST_DROID_CODEC_ENCODER_VIDEO, "video/x-vp8", "video/x-vnd.on2.vp8", 
+	"video/x-vp8", TRUE, 
+	NULL, NULL, create_vp8venc_codec_data, NULL, NULL, NULL, NULL},
 };
 
 GstDroidCodec *
@@ -406,6 +411,15 @@ create_mpeg4venc_codec_data (DroidMediaData * data)
   GST_BUFFER_DTS (codec_data) = GST_CLOCK_TIME_NONE;
   GST_BUFFER_DURATION (codec_data) = GST_CLOCK_TIME_NONE;
   GST_BUFFER_FLAG_SET (codec_data, GST_BUFFER_FLAG_HEADER);
+
+  return codec_data;
+}
+
+static GstBuffer *
+create_vp8venc_codec_data (DroidMediaData * data)
+{
+  GstBuffer *codec_data = gst_buffer_new_allocate (NULL, data->size, NULL);
+  gst_buffer_fill (codec_data, 0, data->data, data->size);
 
   return codec_data;
 }
